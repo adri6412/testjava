@@ -2,7 +2,7 @@ package com.example.anagrafica.controller;
 
 import com.example.anagrafica.dto.UtenteDTO;
 import com.example.anagrafica.service.UtenteService;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

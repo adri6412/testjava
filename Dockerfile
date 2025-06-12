@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:11-jdk-alpine
 LABEL maintainer="adriano@example.com"
 
 # Variabili d'ambiente

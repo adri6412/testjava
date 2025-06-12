@@ -4,7 +4,7 @@ import com.example.anagrafica.dto.JwtResponseDTO;
 import com.example.anagrafica.dto.LoginDTO;
 import com.example.anagrafica.dto.RegistrazioneDTO;
 import com.example.anagrafica.service.AuthService;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
