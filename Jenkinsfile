@@ -49,25 +49,26 @@ pipeline {
         stage('Fortify Scan') {
             steps {
                 // Esegui la scansione di sicurezza con Fortify
-                withCredentials([fortifyToken(credentialsId: 'fortifyjenkins', variable: 'FORTIFY_TOKEN')]) {
-                    sh '''
-                        # Traduzione del codice sorgente
-                        sourceanalyzer -b anagrafica-service -clean
-                        sourceanalyzer -b anagrafica-service -source 1.11 -cp "target/classes:target/dependency/*" src/main/java
-                        
-                        # Scansione del codice
-                        sourceanalyzer -b anagrafica-service -scan -f results.fpr
-                        
-                        # Generazione del report
-                        ReportGenerator -template "DISA STIG" -format pdf -f fortify-report.pdf -source results.fpr
-                        
-                        # Opzionale: Caricamento su Fortify Software Security Center (SSC)
-                        # fortifyclient -url ${FORTIFY_SSC_URL} -authtoken ${FORTIFY_TOKEN} uploadFPR -file results.fpr -application "Anagrafica Service" -applicationVersion "1.0"
-                    '''
-                }
+                // Pulizia dell'ambiente Fortify
+                fortifyClean buildID: 'anagrafica-service'
+                
+                // Traduzione del codice sorgente
+                fortifyTranslate buildID: 'anagrafica-service', 
+                                 projectScanType: fortifyJava(javaVersion: '1.11', 
+                                                             javaSrcFiles: 'src/main/java/**/*.java',
+                                                             javaClasspath: 'target/classes:target/dependency/*')
+                
+                // Scansione del codice
+                fortifyScan buildID: 'anagrafica-service', resultsFile: 'results.fpr'
+                
+                // Caricamento su Fortify Software Security Center (SSC)
+                fortifyUpload appName: 'Anagrafica Service', 
+                              appVersion: '1.0', 
+                              resultsFile: 'results.fpr',
+                              credentialsId: 'fortifyjenkins'
                 
                 // Archivia i risultati della scansione
-                archiveArtifacts artifacts: 'results.fpr, fortify-report.pdf', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'results.fpr', allowEmptyArchive: true
             }
         }
         
