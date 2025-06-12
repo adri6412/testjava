@@ -49,7 +49,7 @@ pipeline {
         stage('Fortify Scan') {
             steps {
                 // Esegui la scansione di sicurezza con Fortify
-                withCredentials([string(credentialsId: 'fortify-token', variable: 'FORTIFY_TOKEN')]) {
+                withCredentials([string(credentialsId: 'fortifyjenkins', variable: 'FORTIFY_TOKEN')]) {
                     sh '''
                         # Traduzione del codice sorgente
                         sourceanalyzer -b anagrafica-service -clean
