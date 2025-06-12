@@ -46,6 +46,31 @@ pipeline {
             }
         }
         
+        stage('Fortify Scan') {
+            steps {
+                // Esegui la scansione di sicurezza con Fortify
+                withCredentials([string(credentialsId: 'fortify-token', variable: 'FORTIFY_TOKEN')]) {
+                    sh '''
+                        # Traduzione del codice sorgente
+                        sourceanalyzer -b anagrafica-service -clean
+                        sourceanalyzer -b anagrafica-service -source 1.11 -cp "target/classes:target/dependency/*" src/main/java
+                        
+                        # Scansione del codice
+                        sourceanalyzer -b anagrafica-service -scan -f results.fpr
+                        
+                        # Generazione del report
+                        ReportGenerator -template "DISA STIG" -format pdf -f fortify-report.pdf -source results.fpr
+                        
+                        # Opzionale: Caricamento su Fortify Software Security Center (SSC)
+                        # fortifyclient -url ${FORTIFY_SSC_URL} -authtoken ${FORTIFY_TOKEN} uploadFPR -file results.fpr -application "Anagrafica Service" -applicationVersion "1.0"
+                    '''
+                }
+                
+                // Archivia i risultati della scansione
+                archiveArtifacts artifacts: 'results.fpr, fortify-report.pdf', allowEmptyArchive: true
+            }
+        }
+        
         // Le fasi Docker sono state rimosse per semplificare la pipeline
     }
     
