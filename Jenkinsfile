@@ -8,6 +8,7 @@ pipeline {
         
         // Utilizza la JDK 11 disponibile nel tuo ambiente Jenkins
         jdk 'OJDK11'
+        maven 'Maven'  // Deve corrispondere al nome del tool configurato
     }
     
     stages {
