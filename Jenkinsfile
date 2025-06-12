@@ -64,8 +64,7 @@ pipeline {
                 // Caricamento su Fortify Software Security Center (SSC)
                 fortifyUpload appName: 'Anagrafica Service', 
                               appVersion: '1.0', 
-                              resultsFile: 'results.fpr',
-                              credentialsId: 'fortifyjenkins'
+                              resultsFile: 'results.fpr'
                 
                 // Archivia i risultati della scansione
                 archiveArtifacts artifacts: 'results.fpr', allowEmptyArchive: true
