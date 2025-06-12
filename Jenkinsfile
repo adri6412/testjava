@@ -2,10 +2,12 @@ pipeline {
     agent any
     
     tools {
-        // Specifica la versione di Maven da utilizzare
-        maven 'Maven 3.8.6'
-        // Specifica la versione di JDK da utilizzare (deve essere Java 17 o superiore)
-        jdk 'JDK 17'
+        // Utilizza la versione di Maven disponibile nel tuo ambiente Jenkins
+        // Se non hai un'installazione di Maven configurata, puoi rimuovere questa riga
+        // e utilizzare il Maven wrapper del progetto
+        
+        // Utilizza la JDK 11 disponibile nel tuo ambiente Jenkins
+        jdk 'OJDK11'
     }
     
     stages {
@@ -37,6 +39,10 @@ pipeline {
         }
         
         stage('Code Quality') {
+            when {
+                // Esegui questa fase solo se SonarQube è configurato
+                expression { return false } // Disabilitato per ora, cambia in 'true' quando SonarQube è configurato
+            }
             steps {
                 // Analisi del codice con SonarQube
                 withSonarQubeEnv('SonarQube') {
@@ -46,6 +52,16 @@ pipeline {
         }
         
         stage('Build Docker Image') {
+            when {
+                // Esegui questa fase solo se Docker è installato
+                expression {
+                    try {
+                        sh(script: 'docker --version', returnStatus: true) == 0
+                    } catch (Exception e) {
+                        return false
+                    }
+                }
+            }
             steps {
                 // Costruisci l'immagine Docker
                 sh 'docker build -t anagrafica-service:${BUILD_NUMBER} .'
@@ -54,6 +70,16 @@ pipeline {
         }
         
         stage('Deploy to Development') {
+            when {
+                // Esegui questa fase solo se Docker è installato e l'immagine è stata creata
+                expression {
+                    try {
+                        sh(script: 'docker --version', returnStatus: true) == 0
+                    } catch (Exception e) {
+                        return false
+                    }
+                }
+            }
             steps {
                 // Deploy in ambiente di sviluppo
                 sh 'docker stop anagrafica-service-dev || true'
