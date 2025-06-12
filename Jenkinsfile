@@ -31,8 +31,6 @@ pipeline {
                 // Esegui i test
                 sh 'mvn test'
             }
-            post {
-            }
         }
         
         stage('Code Quality') {
