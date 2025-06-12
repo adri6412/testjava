@@ -32,10 +32,6 @@ pipeline {
                 sh 'mvn test'
             }
             post {
-                always {
-                    // Pubblica i risultati dei test
-                    junit '**/target/surefire-reports/*.xml'
-                }
             }
         }
         
