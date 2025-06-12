@@ -31,6 +31,12 @@ pipeline {
                 // Esegui i test
                 sh 'mvn test'
             }
+            post {
+                always {
+                    // Pubblica i risultati dei test
+                    junit '**/target/surefire-reports/*.xml'
+                }
+            }
         }
         
         stage('Code Quality') {
@@ -46,42 +52,7 @@ pipeline {
             }
         }
         
-        stage('Build Docker Image') {
-            when {
-                // Esegui questa fase solo se Docker è installato
-                expression {
-                    try {
-                        sh(script: 'docker --version', returnStatus: true) == 0
-                    } catch (Exception e) {
-                        return false
-                    }
-                }
-            }
-            steps {
-                // Costruisci l'immagine Docker
-                sh 'docker build -t anagrafica-service:${BUILD_NUMBER} .'
-                sh 'docker tag anagrafica-service:${BUILD_NUMBER} anagrafica-service:latest'
-            }
-        }
-        
-        stage('Deploy to Development') {
-            when {
-                // Esegui questa fase solo se Docker è installato e l'immagine è stata creata
-                expression {
-                    try {
-                        sh(script: 'docker --version', returnStatus: true) == 0
-                    } catch (Exception e) {
-                        return false
-                    }
-                }
-            }
-            steps {
-                // Deploy in ambiente di sviluppo
-                sh 'docker stop anagrafica-service-dev || true'
-                sh 'docker rm anagrafica-service-dev || true'
-                sh 'docker run -d --name anagrafica-service-dev -p 8080:8080 --network app-network -e SPRING_PROFILES_ACTIVE=dev anagrafica-service:latest'
-            }
-        }
+        // Le fasi Docker sono state rimosse per semplificare la pipeline
     }
     
     post {
